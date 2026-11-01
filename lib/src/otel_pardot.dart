@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_pardot_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_pardot';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class PardotResult {
+  /// Creates a result.
   const PardotResult({
     this.businessUnitId,
     this.objectKind,
@@ -89,8 +90,13 @@ class PardotResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class PardotCallResult<T> {
+  /// Creates a call result.
   const PardotCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final PardotResult? result;
 }
@@ -130,7 +136,7 @@ Future<T> tracedPardot<T>({
   final span = _tracer().startSpan(
     'pardot $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
@@ -138,125 +144,125 @@ Future<T> tracedPardot<T>({
       final res = r.result!;
       final extras = <Attribute<Object>>[];
       if (res.businessUnitId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.business_unit.id',
           res.businessUnitId!,
         ));
       }
       if (res.objectKind != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.object.kind',
           res.objectKind!,
         ));
       }
       if (res.objectId != null) {
-        extras.add(OTel.attributeString('pardot.object.id', res.objectId!));
+        extras.add(OTelAPI.attributeString('pardot.object.id', res.objectId!));
       }
       if (res.action != null) {
-        extras.add(OTel.attributeString('pardot.action', res.action!));
+        extras.add(OTelAPI.attributeString('pardot.action', res.action!));
       }
       if (res.prospectGrade != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.prospect.grade',
           res.prospectGrade!,
         ));
       }
       if (res.prospectScore != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.prospect.score',
           res.prospectScore!,
         ));
       }
       if (res.listEmailId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.list_email.id',
           res.listEmailId!,
         ));
       }
       if (res.deliveredCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.email.delivered_count',
           res.deliveredCount!,
         ));
       }
       if (res.openCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.email.open_count',
           res.openCount!,
         ));
       }
       if (res.clickCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.email.click_count',
           res.clickCount!,
         ));
       }
       if (res.bouncedCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.email.bounced_count',
           res.bouncedCount!,
         ));
       }
       if (res.unsubscribedCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.email.unsubscribed_count',
           res.unsubscribedCount!,
         ));
       }
       if (res.formId != null) {
-        extras.add(OTel.attributeString('pardot.form.id', res.formId!));
+        extras.add(OTelAPI.attributeString('pardot.form.id', res.formId!));
       }
       if (res.formSubmissions != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.form.submissions',
           res.formSubmissions!,
         ));
       }
       if (res.campaignId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.campaign.id',
           res.campaignId!,
         ));
       }
       if (res.engagementProgram != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.engagement.program',
           res.engagementProgram!,
         ));
       }
       if (res.engagementStep != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.engagement.step',
           res.engagementStep!,
         ));
       }
       if (res.dailyApiCallsUsed != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.quota.daily_used',
           res.dailyApiCallsUsed!,
         ));
       }
       if (res.dailyApiCallsLimit != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'pardot.quota.daily_limit',
           res.dailyApiCallsLimit!,
         ));
       }
       if (res.errorCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.error.code',
           res.errorCode!,
         ));
         span.setStatus(SpanStatusCode.Error, 'Pardot ${res.errorCode}');
       }
       if (res.errorMessage != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'pardot.error.message',
           res.errorMessage!,
         ));
       }
       if (res.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           res.statusCode!,
         ));
@@ -264,13 +270,13 @@ Future<T> tracedPardot<T>({
           span.setStatus(SpanStatusCode.Error, 'Pardot HTTP ${res.statusCode}');
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
